@@ -1,0 +1,193 @@
+==============================================================
+ BACKEND YAMIL — CÓMO USAR ESTE CÓDIGO
+ Proyecto: Yamila Potel | Asesoría Contable, Impositiva,
+           Económica y Financiera
+ Archivo: GAS/Code.gs
+ Fecha: 28/10/2026
+==============================================================
+
+Este archivo es TODO el backend de la web. Va dentro de
+Google Apps Script (de acá en adelante lo llamamos "GAS").
+
+Lo que hace:
+  - Crea las columnas de la hoja "YP - Base de datos".
+  - Recibe los formularios de la web (contacto y diagnóstico).
+  - Escribe cada envío como una fila nueva en la planilla.
+  - Manda un email de respaldo a Yamila con GmailApp.
+  - Responde { ok: true } a la web.
+
+No necesita claves, contraseñas ni API keys: corre con los
+permisos de la cuenta de Google que lo ejecuta.
+
+
+==============================================================
+ PASO 1 — Pegar el código en el GAS
+==============================================================
+
+1. Abrí la hoja de cálculo "YP - Base de datos".
+2. Menú: Extensiones > Apps Script.
+   (Se abre el editor vinculado a esa hoja. Si preferís,
+    también podés entrar a script.google.com y abrir el
+    proyecto "Backend Yamil" que ya creaste.)
+3. En el editor, borrá el archivo que venga por defecto
+   (se llama Code.gs y está vacío o con "function myFunction(){}").
+4. Abrí GAS/Code.gs, seleccioná TODO el contenido
+   (Ctrl+A) y pegalo ahí (Ctrl+V).
+5. Guardá con Ctrl+S. Poné nombre "Code.gs" si te lo pide.
+
+
+==============================================================
+ PASO 2 — Crear las columnas de la hoja
+==============================================================
+
+1. Volvé a la pestaña de la hoja de cálculo.
+2. Recargá la página (F5). Aparece un menú nuevo arriba:
+   "Backend Yamil".
+3. Clic en "Backend Yamil" > "1) Preparar hoja (crear columnas)".
+4. La primera vez te va a pedir PERMISOS:
+     - Clic en "Revisar permisos".
+     - Elegí tu cuenta de Google (la nueva del proyecto).
+     - Si dice "Google no verificó esta aplicación":
+       clic en "Configuración avanzada" > "Ir a Backend Yamil
+       (no seguro)" > "Permitir".
+     - Aceptá acceso a Hojas de cálculo, Drive y Gmail.
+   Esto pasa una sola vez y es normal.
+5. Debería aparecer un mensaje de "hoja preparada" y en la
+   planilla quedan dos pestañas:
+
+   Pestaña "Consultas" (9 columnas):
+     fecha | origen | servicio | nombre | email | telefono |
+     campos_extra | mensaje | estado
+
+   Pestaña "Diagnosticos" (21 columnas):
+     fecha | estado | nombre | negocio | rubro | antiguedad |
+     tipo_gestion | registro_movimientos | frecuencia_revision |
+     sistema_registro | medios_cobro | pct_facturacion |
+     nivel_facturacion | cuenta_bancaria | cuenta_exclusiva |
+     retiros_personales | punto_equilibrio | fondo_reserva |
+     control_costos | desafio_principal | comentarios
+
+   Encabezado en borgoña, primera fila congelada, y la
+   columna "estado" tiene un desplegable con:
+   pendiente / contactado / propuesta enviada / cerrada.
+
+SI NO APARECE EL MENÚ "Backend Yamil":
+  El script no está vinculado a la hoja (pasó si lo abriste
+  desde script.google.com). Entonces:
+  - En el editor, elegí la función setupHoja en el listado
+    de funciones (arriba a la izquierda) y clic en Ejecutar.
+  - Ojo: en un proyecto independiente el script no sabe qué
+    hoja usar. Si tira error "No encontré la planilla",
+    copiá el ID de la hoja en la línea ID_PLANILLA = '';
+    El ID está en la URL de la hoja:
+    https://docs.google.com/spreadsheets/d/ESTE_ID/edit
+
+
+==============================================================
+ PASO 3 — Probar que funciona
+==============================================================
+
+1. En la hoja: menú "Backend Yamil" >
+   "2) Probar con una consulta de ejemplo".
+   (Si no hay menú, corré la función probarEnvio desde el editor.)
+2. Qué debería pasar:
+   - Aparece una fila de prueba en la pestaña "Consultas".
+   - Aparece una fila de prueba en la pestaña "Diagnosticos".
+   - Llega un email de prueba a la cuenta del proyecto.
+3. Si llega todo: el backend funciona. Borrá las 2 filas de
+   prueba cuando quieras (son las que dicen "Prueba Backend
+   Yamil" / "prueba-backend").
+4. Si algo falla: fijate en Registros (Logs) del editor
+   (Ver > Registros) y pasame el mensaje.
+
+
+==============================================================
+ PASO 4 — Implementar como app web (obtener la URL)
+==============================================================
+
+1. En el editor de GAS, arriba a la derecha: botón
+   "Implementar" > "Nueva implementación".
+2. Tipo de implementación: "Aplicación web".
+3. Configurá así:
+     Descripción:        Backend Yamil v1
+     Ejecutar como:      Yo
+     Quién tiene acceso: Cualquier persona con el enlace
+4. Clic en "Implementar".
+5. Autorizá de nuevo si lo pide (mismo procedimiento).
+6. Clic en "Copiar URL". Termina en /exec. Ese es el
+   endpoint de la web.
+7. PASAME ESA URL. Con ella conectamos el formulario de
+   contacto a la planilla (Fase 2).
+
+
+==============================================================
+ OJO — Los cambios de código no se aplican solos
+==============================================================
+
+Cada vez que modifiques Code.gs, hay que volver a implementar:
+
+  Implementar > Editar implementación (el engranaje) >
+  Versión: "Nueva versión" > Implementar > copiar la URL
+  (o quedate con la misma, depende de cómo lo configures).
+
+Si no haces esto, la web sigue hablando con la VERSIÓN VIEJA
+del código. Es el error más común.
+
+
+==============================================================
+ SI QUERÉS CAMBIAR ALGO
+==============================================================
+
+Todo lo configurable está arriba de todo, en el bloque
+"CONFIGURACIÓN":
+
+  NOMBRE_PLANILLA      nombre del Google Sheet
+  ID_PLANILLA          ID de la hoja (opcional)
+  PESTANA_CONTACTOS    nombre de la pestaña de contactos
+  PESTANA_DIAGNOSTICOS nombre de la pestaña de diagnósticos
+  EMAIL_NOTIFICACION   email destino (vacío = la misma cuenta)
+  ASUNTO_PREFIX        prefijo de los asuntos
+  ESTADOS              opciones del desplegable de "estado"
+
+Después de cambiar algo: Guardar (Ctrl+S) > volver a
+implementar (arriba) y listo.
+
+Si cambiás el nombre de una pestaña, volvé a correr
+"1) Preparar hoja (crear columnas)" para que cree la nueva.
+
+
+==============================================================
+ SEGURIDAD (por qué no hay claves que ocultar)
+==============================================================
+
+  - GAS NO usa API keys ni contraseñas: corre con los
+    permisos de la cuenta de Google que lo ejecuta.
+  - El endpoint /exec es "público" por cómo funciona Apps
+    Script. La protección es:
+      * honeypot anti-spam (ya incluido),
+      * validación de campos y longitudes (ya incluida),
+      * doGet exige token de Firebase cuando entre el panel
+        admin (Fase 4).
+  - NUNCA poner claves de Gmail/SMTP en el JavaScript de la
+    web. Eso ya está resuelto: todo el envío pasa por acá.
+
+Para el futuro (Firebase, hosting, VPS) están preparados
+Yamila-Potel/.gitignore y Yamila-Potel/.env.example: las
+claves van en .env y el .gitignore impide que suban a GitHub.
+
+
+==============================================================
+ PRÓXIMOS PASOS (cuando tengas la URL /exec)
+==============================================================
+
+  Fase 2: conectar el formulario de contacto
+          (fetch con estados enviando/enviado/error,
+           WhatsApp se abre recién con OK, honeypot).
+  Fase 3: conectar el diagnóstico + MODO_NOTIFICACION = true.
+  Fase 4: Firebase Auth + panel admin.
+  Fase 5: dashboard.
+  Fase 6: endurecimiento y datos personales (Ley 25.326).
+
+==============================================================
+ FIN
+==============================================================

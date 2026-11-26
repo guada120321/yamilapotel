@@ -1,0 +1,45 @@
+# ==============================================================
+#  .gitignore — Backend Yamil / Yamila Potel
+#  Qué NUNCA debe subirse a GitHub
+# ==============================================================
+
+# --- CLAVES Y SECRETOS (lo más importante) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# --- Cuentas de servicio / Firebase Admin ---
+serviceAccount*.json
+*serviceAccount*.json
+firebase-adminsdk*.json
+firebase-*.json
+
+# --- Token de clasp (CLI de Apps Script) ---
+.clasprc.json
+.clasp.json
+
+# --- Node (si usamos server.js / scripts de despliegue) ---
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# --- Archivos de sistema ---
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# --- Editores ---
+.vscode/
+.idea/
+*.swp
+
+# --- Copias de seguridad / temporales ---
+*.bak
+*.tmp
+*~
